@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="K&R Training">
+<title>Koda &amp; Rocky Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+:root{
+  --bg:#F9F6F1;
+  --surface:#FFFFFF;
+  --border:#EAE3D6;
+  --border-soft:#F2EDE4;
+  --text:#231A0E;
+  --text-mid:#6B5E4F;
+  --text-soft:#A89A87;
+  --koda:#B8731C;
+  --koda-bg:#FDF4E8;
+  --koda-border:#E8C07A;
+  --rocky:#2E5FAD;
+  --rocky-bg:#EBF0FB;
+  --rocky-border:#8CAAE0;
+  --red:#B91C1C;--red-bg:#FEF2F2;--red-border:#FECACA;
+  --orange:#C2610C;--orange-bg:#FFF7ED;--orange-border:#FED7AA;
+  --yellow:#A16207;--yellow-bg:#FEFCE8;--yellow-border:#FDE68A;
+  --green:#15803D;--green-bg:#F0FDF4;--green-border:#BBF7D0;
+  --blue:#1D4ED8;--blue-bg:#EFF6FF;--blue-border:#BFDBFE;
+  --purple:#6D28D9;--purple-bg:#F5F3FF;--purple-border:#C4B5FD;
+  --shadow-sm:0 1px 2px rgba(35,26,14,.06);
+  --shadow:0 1px 4px rgba(35,26,14,.08),0 2px 8px rgba(35,26,14,.05);
+  --r:14px;--r-sm:10px;
+  --nav-h:72px;
+  --header-h:56px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+
+html,body{height:100%}
+body{
+  font-family:'DM Sans',-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Header ── */
+.hdr{
+  height:var(--header-h);
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  padding:0 16px;
+  position:sticky;top:0;z-index:100;
+}
+.hdr-icon{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--koda),#E8931F);
+  display:flex;align-items:center;justify-content:center;
+}
+.hdr-icon svg{width:18px;height:18px;fill:white}
+.hdr-titles{flex:1;min-width:0}
+.hdr-title{
+  font-family:'DM Serif Display',Georgia,serif;
+  font-size:16px;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hdr-sub{font-size:11px;color:var(--text-soft)}
+.hdr-chip{
+  font-size:11px;font-weight:600;color:var(--text-mid);
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:20px;padding:4px 10px;white-space:nowrap;flex-shrink:0;
+}
+
+/* ── Bottom Nav ── */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;
+  height:calc(var(--nav-h) + var(--safe-b));
+  background:var(--surface);border-top:1px solid var(--border);
+  display:flex;z-index:200;
+  padding-bottom:var(--safe-b);
+  box-shadow:0 -2px 16px rgba(35,26,14,.06);
+}
+.nb{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  border:none;background:none;cursor:pointer;
+  color:var(--text-soft);padding:6px 2px;
+  transition:color .15s;position:relative;
+}
+.nb svg{width:22px;height:22px;transition:transform .15s}
+.nb:active svg{transform:scale(.9)}
+.nb-lbl{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.nb.on{color:var(--text)}
+.nb.on-k{color:var(--koda)}
+.nb.on-r{color:var(--rocky)}
+.nb-dot{
+  width:4px;height:4px;border-radius:50%;background:currentColor;
+  position:absolute;bottom:10px;opacity:0;transition:opacity .15s;
+}
+.nb.on .nb-dot,.nb.on-k .nb-dot,.nb.on-r .nb-dot{opacity:1}
+
+/* ── Panels ── */
+.panel{display:none;animation:fadeUp .18s ease}
+.panel.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.scroll-wrap{padding-bottom:calc(var(--nav-h) + var(--safe-b) + 16px)}
+
+/* ── Content ── */
+.cnt{max-width:520px;margin:0 auto;padding:14px 14px 0}
+
+/* ── Section header ── */
+.sh{display:flex;align-items:center;gap:8px;margin:18px 0 10px}
+.sh:first-child{margin-top:0}
+.sh-lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-soft);white-space:nowrap}
+.sh-line{flex:1;height:1px;background:var(--border)}
+
+/* ── Alerts ── */
+.al{border-radius:var(--r);padding:13px 15px;margin-bottom:10px;border:1px solid}
+.al-ttl{font-size:13px;font-weight:700;margin-bottom:7px}
+.al ul{list-style:none}
+.al li{font-size:13px;line-height:1.65;padding:2px 0;display:flex;gap:6px;align-items:flex-start}
+.al li::before{content:'·';flex-shrink:0;margin-top:1px}
+.al-g{background:var(--green-bg);border-color:var(--green-border);color:#14532D}
+.al-y{background:var(--yellow-bg);border-color:var(--yellow-border);color:#713F12}
+.al-b{background:var(--blue-bg);border-color:var(--blue-border);color:#1E3A8A}
+.al-r{background:var(--red-bg);border-color:var(--red-border);color:#7F1D1D}
+.al-p{background:var(--purple-bg);border-color:var(--purple-border);color:#4C1D95}
+
+/* ── HOME: Hero card ── */
+.hero{
+  background:linear-gradient(135deg,#2A1F14 0%,#3C2B18 100%);
+  border-radius:var(--r);padding:18px;margin-bottom:14px;
+  color:white;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:130px;height:130px;background:rgba(184,115,28,.14);
+  border-radius:50%;pointer-events:none;
+}
+.hero::before{
+  content:'';position:absolute;bottom:-30px;right:20px;
+  width:80px;height:80px;background:rgba(46,95,173,.12);
+  border-radius:50%;pointer-events:none;
+}
+.hero-dogs{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.hchip{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px 4px 6px;border-radius:20px;
+  font-size:12px;font-weight:600;
+}
+.hchip.k{background:rgba(184,115,28,.25);color:#FBBF60;border:1px solid rgba(184,115,28,.35)}
+.hchip.r{background:rgba(46,95,173,.25);color:#93B4F0;border:1px solid rgba(46,95,173,.35)}
+.hchip-dot{width:8px;height:8px;border-radius:50%}
+.hchip.k .hchip-dot{background:#E8931F}
+.hchip.r .hchip-dot{background:#4A82E0}
+.hero-sep{color:rgba(255,255,255,.2);font-size:14px}
+.hero-plbl{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:5px}
+.hero-bar-wrap{height:6px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden;margin-bottom:8px}
+.hero-bar{height:100%;background:linear-gradient(90deg,#E8931F,#F0AC45);border-radius:10px;transition:width .4s ease;min-width:4px}
+.hero-stats{display:flex;gap:14px}
+.hstat{display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.55)}
+.hstat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.hstat b{font-weight:700;color:white}
+
+/* ── Priority cards ── */
+.pc{
+  background:var(--surface);border-radius:var(--r-sm);
+  padding:11px 13px;margin-bottom:7px;
+  border:1px solid var(--border);box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;gap:11px;
+}
+.pdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.pdot-c{background:var(--red)}
+.pdot-h{background:var(--orange)}
+.pc-text{flex:1;min-width:0}
+.pc-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.pc-who{font-size:11px;color:var(--text-soft);margin-top:1px}
+.ptag{font-size:10px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:20px;text-transform:uppercase;flex-shrink:0}
+.ptag-k{background:var(--koda-bg);color:var(--koda);border:1px solid var(--koda-border)}
+.ptag-r{background:var(--rocky-bg);color:var(--rocky);border:1px solid var(--rocky-border)}
+.ptag-b{background:var(--bg);color:var(--text-mid);border:1px solid var(--border)}
+
+/* ── Rules list ── */
+.rules-list{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;margin-bottom:10px}
+.rl{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;font-size:13px;color:var(--text);line-height:1.55;border-bottom:1px solid var(--border-soft)}
+.rl:last-child{border-bottom:none}
+.rb{width:6px;height:6px;border-radius:50%;background:var(--text-soft);flex-shrink:0;margin-top:5px}
+
+/* ── Dog header ── */
+.dog-hdr{border-radius:var(--r);padding:14px 16px;margin-bottom:6px;display:flex;align-items:center;gap:13px}
+.dog-av{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.dog-name{font-family:'DM Serif Display',Georgia,serif;font-size:22px;line-height:1.1}
+.dog-desc{font-size:12px;color:var(--text-mid);margin-top:3px;line-height:1.4}
+
+/* ── Phase ── */
+.ph-section{margin-bottom:22px}
+.ph-hdr{display:flex;align-items:center;gap:9px;margin-bottom:9px;padding:0 1px}
+.ph-badge{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:3px 10px;border-radius:20px;color:white}
+.ph-title{font-size:12px;font-weight:600;color:var(--text-mid)}
+.ph-line{flex:1;height:1px;background:var(--border)}
+
+/* ── Skill card ── */
+.sc{
+  background:var(--surface);border-radius:var(--r);
+  border:1.5px solid var(--border);margin-bottom:9px;
+  overflow:hidden;transition:border-color .2s,background .2s;
+  box-shadow:var(--shadow-sm);
+}
+.sc.s-active{border-color:#FCD34D;background:#FFFBEB}
+.sc.s-done{border-color:var(--green-border);background:var(--green-bg)}
+.sc-body{padding:13px 13px 11px}
+.sc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;margin-bottom:3px}
+.sc-name{font-size:15px;font-weight:700;color:var(--text);line-height:1.3;flex:1}
+.sc-name.x{text-decoration:line-through;opacity:.4}
+.pbadge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.pb-c{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.pb-h{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
+.pb-m{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.pb-g{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.sc-time{font-size:11px;color:var(--text-soft);margin-bottom:7px;display:flex;align-items:center;gap:4px}
+.sc-time svg{width:11px;height:11px;flex-shrink:0}
+.sc-desc{font-size:13px;color:var(--text-mid);line-height:1.65;margin-bottom:9px}
+.tips-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;font-weight:600;background:none;border:none;cursor:pointer;
+  padding:0;color:var(--text-soft);transition:color .15s;
+}
+.tips-btn svg{width:13px;height:13px;transition:transform .2s;flex-shrink:0}
+.tips-btn.open svg{transform:rotate(180deg)}
+.tips-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .25s ease,opacity .2s ease;
+  opacity:0;
+}
+.tips-body.open{max-height:320px;opacity:1}
+.tips-ul{margin-top:9px;list-style:none;border-top:1px solid var(--border-soft);padding-top:9px}
+.tips-ul li{font-size:12px;color:var(--text-mid);line-height:1.65;padding:2px 0;display:flex;gap:7px;align-items:flex-start}
+.tips-ul li::before{content:'—';color:var(--text-soft);flex-shrink:0;margin-top:1px}
+.sc-acts{display:flex;gap:7px;padding:0 13px 11px}
+.sab{
+  flex:1;height:36px;border-radius:var(--r-sm);
+  border:1.5px solid var(--border);background:var(--bg);
+  font-size:12px;font-weight:700;cursor:pointer;
+  color:var(--text-mid);display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.sab:active{transform:scale(.97)}
+.sab.a-active{border-color:#FCD34D;background:#FEF3C7;color:#92400E}
+.sab.a-done{border-color:var(--green-border);background:var(--green-bg);color:var(--green)}
+
+/* ── Timeline (Routine) ── */
+.tl{position:relative;padding-left:14px}
+.tl::before{
+  content:'';position:absolute;left:0;top:20px;bottom:20px;
+  width:2px;background:var(--border);border-radius:2px;
+}
+.tl-item{position:relative;padding:0 0 14px 22px}
+.tl-dot{
+  position:absolute;left:-5px;top:3px;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--border);z-index:1;
+}
+.tl-time{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text-soft);margin-bottom:3px}
+.tl-card{background:var(--surface);border-radius:var(--r-sm);padding:10px 12px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.tl-card p{font-size:13px;color:var(--text);line-height:1.6}
+
+/* ── Health chips ── */
+.hchips{display:flex;gap:7px;margin-bottom:10px}
+.hc{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;text-align:center}
+.hc-lbl{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-soft);margin-bottom:4px}
+.hc-val{font-size:15px;font-weight:700;color:var(--text)}
+.hc-sub{font-size:10px;color:var(--text-soft);margin-top:2px}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-icon">
+    <svg viewBox="0 0 24 24"><path d="M8.35 3C7.05 3 6 4.12 6 5.5S7.05 8 8.35 8c1.3 0 2.35-1.12 2.35-2.5S9.65 3 8.35 3zm7.3 0c-1.3 0-2.35 1.12-2.35 2.5S14.35 8 15.65 8C16.95 8 18 6.88 18 5.5S16.95 3 15.65 3zM4.5 8C3.12 8 2 9.12 2 10.5S3.12 13 4.5 13 7 11.88 7 10.5 5.88 8 4.5 8zm15 0c-1.38 0-2.5 1.12-2.5 2.5S18.12 13 19.5 13 22 11.88 22 10.5 20.88 8 19.5 8zm-7.4 1.5c-3.03 0-6.1 2.45-6.1 5.08 0 1.88 1.13 2.92 2.03 3.58.9.65 1.35.8 2.17 1.74.6.7 1.3 1.1 1.9 1.1.6 0 1.3-.4 1.9-1.1.82-.94 1.27-1.09 2.17-1.74.9-.66 2.03-1.7 2.03-3.58 0-2.63-3.07-5.08-6.1-5.08z"/></svg>
+  </div>
+  <div class="hdr-titles">
+    <div class="hdr-title">Koda &amp; Rocky</div>
+    <div class="hdr-sub">Lebanon · Training · June 2026</div>
+  </div>
+  <div class="hdr-chip" id="hdr-prog">0/13</div>
+</header>
+
+<!-- ════ HOME ════ -->
+<div id="p-home" class="panel on scroll-wrap">
+  <div class="cnt">
+
+    <div class="hero">
+      <div class="hero-dogs">
+        <div class="hchip k"><div class="hchip-dot"></div>Koda</div>
+        <div class="hero-sep">&amp;</div>
+        <div class="hchip r"><div class="hchip-dot"></div>Rocky</div>
+      </div>
+      <div class="hero-plbl">Training progress</div>
+      <div class="hero-bar-wrap"><div class="hero-bar" id="hero-bar" style="width:0%"></div></div>
+      <div class="hero-stats">
+        <div class="hstat"><div class="hstat-dot" style="background:#E8931F"></div><b id="cnt-active">0</b> active</div>
+        <div class="hstat"><div class="hstat-dot" style="background:#4ADE80"></div><b id="cnt-done">0</b> done</div>
+        <div class="hstat"><div class="hstat-dot" style="background:rgba(255,255,255,.2)"></div><b id="cnt-left">13</b> remaining</div>
+      </div>
+    </div>
+
+    <div class="sh"><span class="sh-lbl">Right now</span><div class="sh-line"></div></div>
+
+    <div class="pc"><div class="pdot pdot-c"></div><div class="pc-text"><div class="pc-name">Recall on Long Line</div><div class="pc-who">Urgent — after escape incident</div></div><div class="ptag ptag-k">Koda</div></div>
+    <div class="pc"><div class="pdot pdot-c"></div><div class="pc-text"><div class="pc-name">Nothing In Life Is Free</div><div class="pc-who">Fixes selective compliance</div></div><div class="ptag ptag-k">Koda</div></div>
+    <div class="pc"><div class="pdot pdot-h"></div><div class="pc-text"><div class="pc-name">Home / Pen Command</div><div class="pc-who">Both dogs, start now</div></div><div class="ptag ptag-b">Both</div></div>
+    <div class="pc"><div class="pdot pdot-h"></div><div class="pc-text"><div class="pc-name">Bite &amp; Jump Inhibition</div><div class="pc-who">Evening consistency critical</div></div><div class="ptag ptag-b">Both</div></div>
+    <div class="pc"><div class="pdot pdot-h"></div><div class="pc-text"><div class="pc-name">Down — Verbal Only</div><div class="pc-who">Quick win, 1–2 weeks</div></div><div class="ptag ptag-r">Rocky</div></div>
+
+    <div class="sh"><span class="sh-lbl">Rules in effect</span><div class="sh-line"></div></div>
+    <div class="rules-list">
+      <div class="rl"><div class="rb"></div>Both penned at night — no exceptions until recall reliable and gate closed</div>
+      <div class="rl"><div class="rb"></div>Keep penned until 7am — walkers pass at 6am</div>
+      <div class="rl"><div class="rb"></div>Morning active session 7–8am replaces nighttime energy outlet</div>
+      <div class="rl"><div class="rb"></div>Gate exit points to be physically closed — priority task</div>
+    </div>
+
+    <div class="sh"><span class="sh-lbl">Health snapshot</span><div class="sh-line"></div></div>
+    <div class="al al-g" style="margin-bottom:0">
+      <div class="al-ttl">Treatments done — June 2026</div>
+      <ul>
+        <li>Combined dewormer (Fenbendazole + Praziquantel) given — repeat monthly</li>
+        <li>Isoxazoline tick/flea/mite pill given — repeat monthly</li>
+        <li>Sulfur cream started on ear patches — reassess in 4 weeks</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════ KODA ════ -->
+<div id="p-koda" class="panel scroll-wrap">
+  <div class="cnt">
+
+    <div class="dog-hdr" style="background:var(--koda-bg);border:1.5px solid var(--koda-border)">
+      <div class="dog-av" style="background:linear-gradient(135deg,#FDF0D8,#F5D49A)">🐕</div>
+      <div><div class="dog-name" style="color:var(--koda)">Koda</div><div class="dog-desc">Fast learner · Selective compliance · Tests boundaries</div></div>
+    </div>
+
+    <div class="ph-section">
+      <div class="ph-hdr"><div class="ph-badge" style="background:var(--koda)">Phase 1</div><div class="ph-title">Immediate — Weeks 1–4</div><div class="ph-line"></div></div>
+
+      <div class="sc" id="k1-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="k1-n">Nothing In Life Is Free</div><div class="pbadge pb-c">Critical</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Start now, maintain forever</div>
+        <div class="sc-desc">Every reward (food, pets, freedom, attention) requires a command first. Sit before meals, before going out, before getting pets. Fixes selective compliance at the root.</div>
+        <button class="tips-btn" id="k1-tb" onclick="tt('k1')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="k1-tips"><ul class="tips-ul"><li>Never give food, freedom, or affection without a command first</li><li>If he refuses — wait. Don't repeat. Withhold reward until he complies</li><li>Even 5 seconds of sit before his bowl goes down counts</li><li>Every person on the property must do this consistently</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="k1-p" onclick="sp('k1','active')">In Progress</button><button class="sab" id="k1-d" onclick="sp('k1','done')">Complete</button></div></div>
+
+      <div class="sc" id="k2-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="k2-n">Recall on Long Line</div><div class="pbadge pb-c">Critical</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>4–8 weeks to reliable</div>
+        <div class="sc-desc">Attach a 5–10m rope to his collar. Call once. If he ignores, gentle steady pressure — no yanking. Reward heavily on arrival. Never punish after recall.</div>
+        <button class="tips-btn" id="k2-tb" onclick="tt('k2')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="k2-tips"><ul class="tips-ul"><li>Call only ONCE — repeating teaches him ignoring is an option</li><li>High value treat for recall only (meat/cheese) — nothing else gets this reward</li><li>Practice in low distraction first, add distractions gradually</li><li>Never chase him — use the line calmly</li><li>Always reward arrival even if it took forever</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="k2-p" onclick="sp('k2','active')">In Progress</button><button class="sab" id="k2-d" onclick="sp('k2','done')">Complete</button></div></div>
+
+      <div class="sc" id="k3-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="k3-n">Bite &amp; Jump Inhibition</div><div class="pbadge pb-h">High</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>1–2 weeks with full consistency</div>
+        <div class="sc-desc">Sharp "OW" + immediate complete withdrawal of attention. Turn back, cross arms, zero eye contact. Walk away if he persists. No physical corrections — any reaction is still engagement.</div>
+        <button class="tips-btn" id="k3-tb" onclick="tt('k3')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="k3-tips"><ul class="tips-ul"><li>Any tooth contact = you disappear immediately</li><li>Jump AND bite = leave the area entirely</li><li>Every person on property must react identically</li><li>Exercise him before energy peaks in the evening</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="k3-p" onclick="sp('k3','active')">In Progress</button><button class="sab" id="k3-d" onclick="sp('k3','done')">Complete</button></div></div>
+
+      <div class="sc" id="k4-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="k4-n">Home / Pen Command</div><div class="pbadge pb-h">High</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>2–4 weeks</div>
+        <div class="sc-desc">Use the long line. Practice sending him to the pen with a high value reward waiting inside. Do this randomly during the day — not just at night. Pen = good things.</div>
+        <button class="tips-btn" id="k4-tb" onclick="tt('k4')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="k4-tips"><ul class="tips-ul"><li>Practice 3–5x daily at random times, not just at bedtime</li><li>High value treat waiting inside pen every time</li><li>Say "home" once calmly, guide with line if needed, reward on arrival</li><li>Never make going to the pen feel like punishment</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="k4-p" onclick="sp('k4','active')">In Progress</button><button class="sab" id="k4-d" onclick="sp('k4','done')">Complete</button></div></div>
+    </div>
+
+    <div class="ph-section">
+      <div class="ph-hdr"><div class="ph-badge" style="background:#8B5C1A">Phase 2</div><div class="ph-title">Building — Weeks 4–8</div><div class="ph-line"></div></div>
+
+      <div class="sc" id="k5-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="k5-n">Recall Off Leash</div><div class="pbadge pb-m">Medium</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Only after long line recall is 100% solid</div>
+        <div class="sc-desc">Move off the long line only when he's coming every single time on it. Start in low distraction, test with distractions. Go back to long line if reliability drops.</div>
+        <button class="tips-btn" id="k5-tb" onclick="tt('k5')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="k5-tips"><ul class="tips-ul"><li>A solid long line recall beats a shaky off-leash one — don't rush</li><li>Test off leash in the pen area first (contained)</li><li>Retreat to long line immediately if he ignores once</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="k5-p" onclick="sp('k5','active')">In Progress</button><button class="sab" id="k5-d" onclick="sp('k5','done')">Complete</button></div></div>
+
+      <div class="sc" id="k6-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="k6-n">Stay</div><div class="pbadge pb-m">Medium</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>After recall is reliable</div>
+        <div class="sc-desc">Sit or down, say "stay," take one step back, return and reward. Build duration first, then distance, then distractions. Return to him to reward — don't call him out of stay initially.</div>
+        <button class="tips-btn" id="k6-tb" onclick="tt('k6')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="k6-tips"><ul class="tips-ul"><li>Order: duration first (30 sec) → then distance → then distractions</li><li>Always return to him to reward, not call him out of stay</li><li>If he breaks, reset without punishment and shorten duration</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="k6-p" onclick="sp('k6','active')">In Progress</button><button class="sab" id="k6-d" onclick="sp('k6','done')">Complete</button></div></div>
+    </div>
+
+    <div class="ph-section">
+      <div class="ph-hdr"><div class="ph-badge" style="background:#5C3A0E">Phase 3</div><div class="ph-title">Reliability — Weeks 8–16</div><div class="ph-line"></div></div>
+
+      <div class="sc" id="k7-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="k7-n">Nighttime Freedom</div><div class="pbadge pb-g">Future Goal</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>When gate closed + recall reliable</div>
+        <div class="sc-desc">Koda earns nighttime freedom when recall is reliable off leash, home command works consistently, and the gate exit is physically closed. Criteria-based, not date-based.</div>
+        <button class="tips-btn" id="k7-tb" onclick="tt('k7')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="k7-tips"><ul class="tips-ul"><li>Don't set a date — let his behavior determine the timeline</li><li>Gate exit MUST be physically closed before this is safe</li><li>Rocky will likely earn this back before Koda — that's fine</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="k7-p" onclick="sp('k7','active')">In Progress</button><button class="sab" id="k7-d" onclick="sp('k7','done')">Complete</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ROCKY ════ -->
+<div id="p-rocky" class="panel scroll-wrap">
+  <div class="cnt">
+
+    <div class="dog-hdr" style="background:var(--rocky-bg);border:1.5px solid var(--rocky-border)">
+      <div class="dog-av" style="background:linear-gradient(135deg,#E0E8F8,#B8CCEE)">🐶</div>
+      <div><div class="dog-name" style="color:var(--rocky)">Rocky</div><div class="dog-desc">Eager to please · Reliable recall · Self-corrects · Good listener</div></div>
+    </div>
+
+    <div class="ph-section">
+      <div class="ph-hdr"><div class="ph-badge" style="background:var(--rocky)">Phase 1</div><div class="ph-title">Quick Wins — Weeks 1–2</div><div class="ph-line"></div></div>
+
+      <div class="sc" id="r1-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="r1-n">Down — Verbal Only</div><div class="pbadge pb-h">High</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>1–2 weeks</div>
+        <div class="sc-desc">He knows down with foot cue. Transfer to verbal: say "down" first, pause 2 seconds, then do the foot dig. Gradually reduce foot cue over 10–14 days.</div>
+        <button class="tips-btn" id="r1-tb" onclick="tt('r1')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="r1-tips"><ul class="tips-ul"><li>Say verbal FIRST, always, every time</li><li>Pause 2 full seconds before the foot cue</li><li>After a week, reduce foot dig to a subtle shuffle</li><li>After two weeks, try verbal alone — reward heavily if he gets it</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="r1-p" onclick="sp('r1','active')">In Progress</button><button class="sab" id="r1-d" onclick="sp('r1','done')">Complete</button></div></div>
+
+      <div class="sc" id="r2-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="r2-n">Bite &amp; Jump Inhibition</div><div class="pbadge pb-h">High</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>1–2 weeks</div>
+        <div class="sc-desc">Same as Koda — "OW" + immediate withdrawal. Rocky reads social cues well so this should move faster. Reward four paws on floor immediately and consistently.</div>
+        <button class="tips-btn" id="r2-tb" onclick="tt('r2')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="r2-tips"><ul class="tips-ul"><li>Any tooth contact = complete withdrawal of attention</li><li>Reward four paws on floor immediately</li><li>He reads body language well — be very clear and consistent</li><li>Exercise before evening energy peak</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="r2-p" onclick="sp('r2','active')">In Progress</button><button class="sab" id="r2-d" onclick="sp('r2','done')">Complete</button></div></div>
+
+      <div class="sc" id="r3-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="r3-n">Home / Pen Command</div><div class="pbadge pb-h">High</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>1–2 weeks (faster than Koda)</div>
+        <div class="sc-desc">High value reward waiting in pen, practice randomly throughout the day. His strong recall means this should transfer quickly — likely days not weeks.</div>
+        <button class="tips-btn" id="r3-tb" onclick="tt('r3')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="r3-tips"><ul class="tips-ul"><li>Say "home" or "pen" once, reward heavily on arrival</li><li>Practice randomly during the day, not just at bedtime</li><li>Rocky's recall reliability makes this a quick transfer</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="r3-p" onclick="sp('r3','active')">In Progress</button><button class="sab" id="r3-d" onclick="sp('r3','done')">Complete</button></div></div>
+    </div>
+
+    <div class="ph-section">
+      <div class="ph-hdr"><div class="ph-badge" style="background:#1E4D8C">Phase 2</div><div class="ph-title">Sharpening — Weeks 2–6</div><div class="ph-line"></div></div>
+
+      <div class="sc" id="r4-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="r4-n">Stay</div><div class="pbadge pb-m">Medium</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>2–4 weeks to solid</div>
+        <div class="sc-desc">He's ready for this now. Sit or down, say "stay," one step back, return and reward. Build duration (30 sec), then distance, then distractions. In that order.</div>
+        <button class="tips-btn" id="r4-tb" onclick="tt('r4')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="r4-tips"><ul class="tips-ul"><li>Build in order: duration → distance → distraction</li><li>Return to him to reward — don't call him out of stay at first</li><li>Practice stay before meals — easy built-in daily reps</li><li>5–10 reps per session, keep it short and successful</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="r4-p" onclick="sp('r4','active')">In Progress</button><button class="sab" id="r4-d" onclick="sp('r4','done')">Complete</button></div></div>
+
+      <div class="sc" id="r5-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="r5-n">Recall Maintenance</div><div class="pbadge pb-m">Medium</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Ongoing</div>
+        <div class="sc-desc">His recall is already solid — maintain it with regular practice and random rewards. Don't let it fade from lack of reinforcement.</div>
+        <button class="tips-btn" id="r5-tb" onclick="tt('r5')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="r5-tips"><ul class="tips-ul"><li>Recall him randomly during the day just to reward, not to end fun</li><li>Sometimes call, treat, then release back to play — prevents recall = fun ending</li><li>Keep high value treat reserved specifically for recall</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="r5-p" onclick="sp('r5','active')">In Progress</button><button class="sab" id="r5-d" onclick="sp('r5','done')">Complete</button></div></div>
+    </div>
+
+    <div class="ph-section">
+      <div class="ph-hdr"><div class="ph-badge" style="background:#163A6B">Phase 3</div><div class="ph-title">Advanced — Weeks 6–12</div><div class="ph-line"></div></div>
+
+      <div class="sc" id="r6-c"><div class="sc-body">
+        <div class="sc-top"><div class="sc-name" id="r6-n">Nighttime Freedom</div><div class="pbadge pb-g">Future Goal</div></div>
+        <div class="sc-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>3–4 weeks once gate exit is closed</div>
+        <div class="sc-desc">Rocky has already shown he self-corrects and returns reliably. Once gate exit is physically blocked, he's close to earning nighttime freedom back.</div>
+        <button class="tips-btn" id="r6-tb" onclick="tt('r6')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg><span>Show tips</span></button>
+        <div class="tips-body" id="r6-tips"><ul class="tips-ul"><li>Gate exit must be closed first — his good behavior doesn't override an open exit</li><li>Test one supervised night first before fully returning to unsupervised</li><li>He'll earn this back significantly before Koda</li></ul></div>
+      </div><div class="sc-acts"><button class="sab" id="r6-p" onclick="sp('r6','active')">In Progress</button><button class="sab" id="r6-d" onclick="sp('r6','done')">Complete</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ROUTINE ════ -->
+<div id="p-routine" class="panel scroll-wrap">
+  <div class="cnt">
+    <div class="al al-b" style="margin-bottom:18px">
+      <div class="al-ttl">Core principle</div>
+      Replace nighttime energy outlet with structured morning and evening sessions. They'll adjust within a week.
+    </div>
+
+    <div class="sh" style="margin-top:0"><span class="sh-lbl">Daily schedule</span><div class="sh-line"></div></div>
+    <div class="tl">
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">6:00 am</div><div class="tl-card"><p>Keep both penned — walkers pass at this time. Breaks the morning sneak-out trigger.</p></div></div>
+      <div class="tl-item"><div class="tl-dot" style="border-color:var(--koda);background:var(--koda-bg)"></div><div class="tl-time">7:00 am</div><div class="tl-card"><p>Morning active session — running, fetch, perimeter walk (30–45 min). Burns energy and doubles as training time.</p></div></div>
+      <div class="tl-item"><div class="tl-dot" style="border-color:var(--koda);background:var(--koda-bg)"></div><div class="tl-time">8:00 am</div><div class="tl-card"><p>Recall + home/pen practice. 5–10 reps each dog while energy is still up.</p></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">10am – 3pm</div><div class="tl-card"><p>Free roam or pen. Natural nap window. Supervised where possible.</p></div></div>
+      <div class="tl-item"><div class="tl-dot" style="border-color:var(--rocky);background:var(--rocky-bg)"></div><div class="tl-time">4:00 pm</div><div class="tl-card"><p>Short training session — commands, stay, pen work. 10–15 min per dog.</p></div></div>
+      <div class="tl-item"><div class="tl-dot" style="border-color:var(--rocky);background:var(--rocky-bg)"></div><div class="tl-time">5:30 pm</div><div class="tl-card"><p>Active exercise or chew BEFORE energy peaks — prevents evening biting.</p></div></div>
+      <div class="tl-item" style="padding-bottom:0"><div class="tl-dot" style="border-color:var(--text);background:var(--text)"></div><div class="tl-time">Night</div><div class="tl-card"><p>Both penned. Until gate exits are closed and recall is reliable off-leash.</p></div></div>
+    </div>
+
+    <div class="sh"><span class="sh-lbl">House boy rules</span><div class="sh-line"></div></div>
+    <div class="al al-r" style="margin-bottom:0">
+      <div class="al-ttl">While you're away</div>
+      <ul>
+        <li>No organs, meat, or extras — puppy food only</li>
+        <li>Both penned at night, no exceptions</li>
+        <li>Monthly dewormer + isoxazoline on marked dates</li>
+        <li>No petting dogs when they're jumping</li>
+        <li>Remove stool from pen and garden daily</li>
+        <li>Do not repeat commands — say once and wait</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HEALTH ════ -->
+<div id="p-health" class="panel scroll-wrap">
+  <div class="cnt">
+    <div class="hchips">
+      <div class="hc"><div class="hc-lbl">Weight</div><div class="hc-val">~30 kg</div><div class="hc-sub">Both dogs</div></div>
+      <div class="hc"><div class="hc-lbl">Last treated</div><div class="hc-val">Jun '26</div><div class="hc-sub">Full round done</div></div>
+      <div class="hc"><div class="hc-lbl">Next dose</div><div class="hc-val">1 month</div><div class="hc-sub">Combined dewormer</div></div>
+    </div>
+
+    <div class="al al-g">
+      <div class="al-ttl">Done — June 2026</div>
+      <ul>
+        <li>Combined dewormer (Fenbendazole + Praziquantel) — single monthly pill</li>
+        <li>Isoxazoline tick/flea/mite pill</li><li>Sulfur cream started on ear patches</li>
+        <li>Parasite spray applied</li><li>Tick manually removed</li>
+      </ul>
+    </div>
+
+    <div class="al al-y">
+      <div class="al-ttl">Upcoming</div>
+      <ul>
+        <li>Combined dewormer (Fenbendazole + Praziquantel) — 1 month from now</li>
+        <li>Isoxazoline next dose — 30 days from now</li>
+        <li>Reassess ear patches — 4 weeks from now</li>
+      </ul>
+    </div>
+
+    <div class="al al-b">
+      <div class="al-ttl">Dosing reference (~30kg each)</div>
+      <ul>
+        <li>Combined dewormer (Fenbendazole + Praziquantel): single monthly pill, dose per label for ~30kg</li>
+        <li>Isoxazoline: weight-bracket tablet per product label, monthly</li>
+        <li>Sulfur cream: apply to ear patches as directed, keep area dry</li>
+      </ul>
+    </div>
+
+    <div class="al al-p" style="margin-bottom:0">
+      <div class="al-ttl">What to watch</div>
+      <ul>
+        <li>Worms in stool next 1–3 days — normal, means it's working</li>
+        <li>Ear patches: slow improvement expected over 3–4 weeks</li>
+        <li>Tick bite site — watch for redness or swelling</li>
+        <li>If patches not improving in 4 weeks — may be ringworm, needs antifungal</li>
+        <li>Rancid organ GI symptoms — should clear within 48 hours</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════ Bottom Nav ════ -->
+<nav class="bnav">
+  <button class="nb on" id="nb-home" onclick="show('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 4l9 8"/><path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/></svg>
+    <span class="nb-lbl">Home</span><div class="nb-dot"></div>
+  </button>
+  <button class="nb" id="nb-koda" onclick="show('koda')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.35 3C7.05 3 6 4.12 6 5.5S7.05 8 8.35 8c1.3 0 2.35-1.12 2.35-2.5S9.65 3 8.35 3zm7.3 0c-1.3 0-2.35 1.12-2.35 2.5S14.35 8 15.65 8C16.95 8 18 6.88 18 5.5S16.95 3 15.65 3zM4.5 8C3.12 8 2 9.12 2 10.5S3.12 13 4.5 13 7 11.88 7 10.5 5.88 8 4.5 8zm15 0c-1.38 0-2.5 1.12-2.5 2.5S18.12 13 19.5 13 22 11.88 22 10.5 20.88 8 19.5 8zm-7.4 1.5c-3.03 0-6.1 2.45-6.1 5.08 0 1.88 1.13 2.92 2.03 3.58.9.65 1.35.8 2.17 1.74.6.7 1.3 1.1 1.9 1.1.6 0 1.3-.4 1.9-1.1.82-.94 1.27-1.09 2.17-1.74.9-.66 2.03-1.7 2.03-3.58 0-2.63-3.07-5.08-6.1-5.08z"/></svg>
+    <span class="nb-lbl">Koda</span><div class="nb-dot"></div>
+  </button>
+  <button class="nb" id="nb-rocky" onclick="show('rocky')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.35 3C7.05 3 6 4.12 6 5.5S7.05 8 8.35 8c1.3 0 2.35-1.12 2.35-2.5S9.65 3 8.35 3zm7.3 0c-1.3 0-2.35 1.12-2.35 2.5S14.35 8 15.65 8C16.95 8 18 6.88 18 5.5S16.95 3 15.65 3zM4.5 8C3.12 8 2 9.12 2 10.5S3.12 13 4.5 13 7 11.88 7 10.5 5.88 8 4.5 8zm15 0c-1.38 0-2.5 1.12-2.5 2.5S18.12 13 19.5 13 22 11.88 22 10.5 20.88 8 19.5 8zm-7.4 1.5c-3.03 0-6.1 2.45-6.1 5.08 0 1.88 1.13 2.92 2.03 3.58.9.65 1.35.8 2.17 1.74.6.7 1.3 1.1 1.9 1.1.6 0 1.3-.4 1.9-1.1.82-.94 1.27-1.09 2.17-1.74.9-.66 2.03-1.7 2.03-3.58 0-2.63-3.07-5.08-6.1-5.08z"/></svg>
+    <span class="nb-lbl">Rocky</span><div class="nb-dot"></div>
+  </button>
+  <button class="nb" id="nb-routine" onclick="show('routine')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span class="nb-lbl">Routine</span><div class="nb-dot"></div>
+  </button>
+  <button class="nb" id="nb-health" onclick="show('health')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+    <span class="nb-lbl">Health</span><div class="nb-dot"></div>
+  </button>
+</nav>
+
+<script>
+const ALL=['k1','k2','k3','k4','k5','k6','k7','r1','r2','r3','r4','r5','r6'];
+const TOTAL=ALL.length;
+
+function show(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on','on-k','on-r'));
+  document.getElementById('p-'+name).classList.add('on');
+  const btn=document.getElementById('nb-'+name);
+  if(name==='koda') btn.classList.add('on-k');
+  else if(name==='rocky') btn.classList.add('on-r');
+  else btn.classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function tt(id){
+  const body=document.getElementById(id+'-tips');
+  const btn=document.getElementById(id+'-tb');
+  const span=btn.querySelector('span');
+  const open=body.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  span.textContent=open?'Hide tips':'Show tips';
+}
+
+function sp(id,type){
+  const state=JSON.parse(localStorage.getItem('dogTraining')||'{}');
+  if(state[id]===type) delete state[id]; else state[id]=type;
+  localStorage.setItem('dogTraining',JSON.stringify(state));
+  render();
+}
+
+function render(){
+  const state=JSON.parse(localStorage.getItem('dogTraining')||'{}');
+  let active=0,done=0;
+  ALL.forEach(id=>{
+    const card=document.getElementById(id+'-c');
+    const name=document.getElementById(id+'-n');
+    const pb=document.getElementById(id+'-p');
+    const db=document.getElementById(id+'-d');
+    if(!card) return;
+    card.className='sc';name.className='sc-name';
+    pb.className='sab';db.className='sab';
+    if(state[id]==='active'){
+      active++;card.classList.add('s-active');
+      pb.classList.add('a-active');pb.textContent='Active';db.textContent='Complete';
+    } else if(state[id]==='done'){
+      done++;card.classList.add('s-done');name.classList.add('x');
+      db.classList.add('a-done');db.textContent='Done';pb.textContent='In Progress';
+    } else {
+      pb.textContent='In Progress';db.textContent='Complete';
+    }
+  });
+  const pct=Math.round(done/TOTAL*100);
+  document.getElementById('hero-bar').style.width=pct+'%';
+  document.getElementById('cnt-active').textContent=active;
+  document.getElementById('cnt-done').textContent=done;
+  document.getElementById('cnt-left').textContent=TOTAL-done;
+  document.getElementById('hdr-prog').textContent=done+'/'+TOTAL;
+}
+
+render();
+</script>
+</body>
+</html>
